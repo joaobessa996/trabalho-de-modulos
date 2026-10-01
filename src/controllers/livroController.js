@@ -1,0 +1,59 @@
+const Livro = require('../models/Livro');
+const { Op } = require('sequelize');
+ 
+async function cadastrar(req, res) {
+  try {
+    const { titulo, autor, quantidade_estoque } = req.body;
+ 
+    const livro = await Livro.create({
+      titulo,
+      autor,
+      quantidade_estoque,
+    });
+ 
+    res.status(201).json(livro);
+  } catch (erro) {
+    res.status(400).json({
+      mensagem: 'Erro ao cadastrar livro',
+      erro: erro.message,
+    });
+  }
+}
+ 
+async function listar(req, res) {
+  try {
+    const livros = await Livro.findAll();
+    res.json(livros);
+  } catch (erro) {
+    res.status(400).json({
+      mensagem: 'Erro ao listar livros',
+      erro: erro.message,
+    });
+  }
+}
+ 
+async function deletar(req, res) {
+  try {
+    const { id } = req.params;
+ 
+    const livro = await Livro.findByPk(id);
+    if (!livro) {
+      return res.status(404).json({
+        mensagem: 'Livro não encontrado',
+      });
+    }
+ 
+    await livro.destroy();
+ 
+    res.status(200).json({
+      mensagem: 'Livro removido com sucesso',
+    });
+  } catch (erro) {
+    res.status(400).json({
+      mensagem: 'Erro ao remover livro',
+      erro: erro.message,
+    });
+  }
+}
+ 
+module.exports = { cadastrar, listar, deletar };
